@@ -1,0 +1,59 @@
+---
+- name: Install Apache web server
+  apt:
+    name: apache2
+    state: present
+
+- name: Install MySQL client
+  apt:
+    name: mysql-client
+    state: present
+
+- name: Install Python MySQL library
+  apt:
+    name: python3-mysqldb
+    state: present
+
+- name: Copy Apache configuration file
+  template:
+    src: /home/grigory/apache-mysql/templates/apache.conf.j2
+    dest: /etc/apache2/sites-available/000-default.conf
+    mode: 0644
+  notify: Restart Apache
+
+- name: Enable Apache rewrite module
+  apache2_module:
+    state: present
+    name: rewrite
+  notify: Restart Apache
+
+- name: Install SQL server
+  apt:
+    name: mysql-server
+    state: present
+
+- name: Create MySQL database
+  mysql_db:
+    name: mydatabase
+    state: present
+  become: true
+
+- name: Create MySQL user
+  mysql_user:
+    name: myuser
+    password: mypassword
+    priv: '*.*:ALL'
+    state: present
+  become: true
+
+- name: Copy PHP application files
+  copy:
+    src: app
+    dest: /var/www/html
+    mode: 0755
+
+- name: Configure PHP application database connection
+  template:
+    src: /home/grigory/apache-mysql/templates/config.php.j2
+    dest: /var/www/html/config.php
+    mode: 0644
