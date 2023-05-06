@@ -1,3 +1,6 @@
+
+sudo ansible-playbook -i /etc/ansible/hosts/inventory.ini ~/playbook.yml -kK -u admini
+
 Role Name
 =========
 
